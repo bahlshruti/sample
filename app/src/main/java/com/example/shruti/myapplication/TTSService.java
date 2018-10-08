@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.Binder;
 import android.speech.tts.SynthesisCallback;
 import android.speech.tts.SynthesisRequest;
 import android.speech.tts.TextToSpeech;
@@ -25,11 +26,19 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
     private static final String TAG="TTSService";
     private int status;
     String reference=null;
-    speechInterface speech;
 
+    private Object ref;
+    // Binder given to clients
+    private final IBinder binder = new LocalBinder();
+    // Registered callbacks
+    private ServiceCallbacks serviceCallbacks;
 
-    public TTSService() {
-
+    // Class used for the client Binder.
+    public class LocalBinder extends Binder {
+        TTSService getService() {
+            // Return this instance of MyService so clients can call public methods
+            return TTSService.this;
+        }
     }
 
     @Override
@@ -49,24 +58,32 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
 
     @Override
     protected void onStop() {
-        Log.v(TAG, "onStop");
-        if (tts != null) {
-            tts.stop();
-        }
+        Log.i(TAG, "onStop service");
     }
+
 
     @Override
     protected void onSynthesizeText(SynthesisRequest synthesisRequest, SynthesisCallback synthesisCallback) {
 
     }
 
-
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+
+        Log.v(TAG, "onbind_service");
+
+        return  binder;
     }
 
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.v(TAG, "onunbinding service");
+        return super.onUnbind(intent);
+    }
+
+    public void setCallbacks(ServiceCallbacks callbacks) {
+        serviceCallbacks = callbacks;
+    }
     @Override
     public void onCreate() {
 
@@ -94,29 +111,28 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        Log.v(TAG, "onstart service");
+        if (intent !=null && intent.getExtras()!=null){
+            str = intent.getExtras().getString("content_to_speak");
+
+        }
+        tts = new TextToSpeech(this,this);  // OnInitListener
+        tts.setSpeechRate(1.0f);
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
     public void onDestroy() {
 
         Log.v(TAG, "Destroy Service");
         // TODO Auto-generated method stub
         if (tts != null) {
-            tts.stop();
-            tts.shutdown();
+
+            tts=null;
         }
         super.onDestroy();
-    }
-
-    @Override
-    public void onStart(Intent intent, int startId) {
-
-        Log.v(TAG, "onstart_service");
-
-        if (intent !=null && intent.getExtras()!=null){
-             str = intent.getExtras().getString("content");
-            reference=intent.getExtras().getString("classFrom");
-        }
-        super.onStart(intent, startId);
-        tts = new TextToSpeech(this,this);  // OnInitListener
-         tts.setSpeechRate(1.0f);
     }
 
     private void say(String str) {
@@ -136,9 +152,10 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
                 public void onDone(String s) {
                     //speaking stopped
                     Log.v(TAG, "about to listen");
-                    //Log.v(TAG, "value of speech: " + speech);
-                    if(reference.equals("parent"))
-                        MainActivity
+                 if (serviceCallbacks != null) {
+                    serviceCallbacks.doSomething();
+                }
+
                 }
 
                 @Override
@@ -149,6 +166,7 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
 
             });
     }
+
 }
 
 

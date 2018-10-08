@@ -22,11 +22,6 @@
             android:enabled="true"
             android:exported="true" />
 
-        <service
-            android:name=".SpeechRecognizerService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity
             android:name=".CommandActivity"
             android:label="@string/title_activity_command"

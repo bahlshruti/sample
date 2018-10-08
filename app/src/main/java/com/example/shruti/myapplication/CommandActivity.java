@@ -15,9 +15,9 @@ public class CommandActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_command);
 
-        Intent speechIntent = new Intent(CommandActivity.this, TTSService.class);
-        speechIntent.putExtra("content","welcome to commands section !");
-        startService(speechIntent);
+        //Intent speechIntent = new Intent(CommandActivity.this, TTSService.class);
+        //speechIntent.putExtra("content","welcome to commands section !");
+        //startService(speechIntent);
 
         //stopService(speechIntent);
     }
