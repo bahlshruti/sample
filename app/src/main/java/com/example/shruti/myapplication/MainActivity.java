@@ -8,21 +8,15 @@ import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.os.Looper;
-import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
-import android.speech.tts.TextToSpeech;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.content.Intent;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -99,8 +93,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
 
     }
-
-
 
     @Override
     protected void onResume() {
@@ -215,7 +207,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                                 confirmation(Result);
 
                             } else if (Result.get(0).equals("yes") && response.equals("yes")) {
-                                Intent intent = new Intent(MainActivity.this, CommandActivity.class);
+                                Intent intent = new Intent(MainActivity.this, ModeActivity.class);
                                 startActivity(intent);
 
                             } else if ((Result.get(0).equals("no") && response.equals("no")) || (Result.get(0).equals("no") && response.equals("yes"))) {
@@ -228,8 +220,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                                 //result='yes' and response ='no'
                                 // exit the application...
                                 finish();
-
-
                             }
                         } else {
                             flag = false;
@@ -237,12 +227,11 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                             speechIntent.putExtra("content_to_speak", "sorry please try again");
                             startService(speechIntent);
                         }
-                        Result.clear();
+                        //Result.clear();
                         break;
                     }
                 }
             }
-
         }
 
         public void confirmation(ArrayList<String> Result)

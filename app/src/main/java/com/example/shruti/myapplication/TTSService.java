@@ -21,7 +21,7 @@ import java.util.Locale;
 
 public class TTSService extends TextToSpeechService  implements TextToSpeech.OnInitListener{
 
-    private String str;
+    private String str,str1;
     private TextToSpeech tts;
     private static final String TAG="TTSService";
     private int status;
@@ -103,7 +103,7 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
                 Log.v(TAG, "Language is not available.");
             } else {
                 Log.v(TAG, "calling say function");
-                say(str);
+                say(str,str1);
             }
         } else {
             Log.v(TAG, "Could not initialize TextToSpeech.");
@@ -116,10 +116,11 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
         Log.v(TAG, "onstart service");
         if (intent !=null && intent.getExtras()!=null){
             str = intent.getExtras().getString("content_to_speak");
+            str1=intent.getExtras().getString("options");
 
         }
         tts = new TextToSpeech(this,this);  // OnInitListener
-        tts.setSpeechRate(1.0f);
+        tts.setSpeechRate(0.75f);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -135,23 +136,26 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
         super.onDestroy();
     }
 
-    private void say(String str) {
+    private void say(String str,String str1) {
 
 
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
             tts.speak(str, TextToSpeech.QUEUE_FLUSH, map);
+            tts.speak(str1, TextToSpeech.QUEUE_ADD, map);
+            
             //Utteranceprogresslistener used to identify whenn TTS is completed...
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override
                 public void onStart(String s) {
                     //speakig started
+                    Log.i(TAG, "started speaking ");
                 }
 
                 @Override
                 public void onDone(String s) {
                     //speaking stopped
-                    Log.v(TAG, "about to listen");
+                    Log.v(TAG, "about to listen "+ s);
                  if (serviceCallbacks != null) {
                     serviceCallbacks.doSomething();
                 }
