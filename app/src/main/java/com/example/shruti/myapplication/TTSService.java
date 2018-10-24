@@ -71,7 +71,6 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
     public IBinder onBind(Intent intent) {
 
         Log.v(TAG, "onbind_service");
-
         return  binder;
     }
 
@@ -103,7 +102,11 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
                 Log.v(TAG, "Language is not available.");
             } else {
                 Log.v(TAG, "calling say function");
-                say(str,str1);
+                if (str1!=null)
+                    say(str,str1);
+                else {
+                    say(str);
+                }
             }
         } else {
             Log.v(TAG, "Could not initialize TextToSpeech.");
@@ -117,10 +120,11 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
         if (intent !=null && intent.getExtras()!=null){
             str = intent.getExtras().getString("content_to_speak");
             str1=intent.getExtras().getString("options");
+            Log.i(TAG, "str1="+str1);
 
         }
         tts = new TextToSpeech(this,this);  // OnInitListener
-        tts.setSpeechRate(0.75f);
+        tts.setSpeechRate(1.0f);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -136,14 +140,12 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
         super.onDestroy();
     }
 
-    private void say(String str,String str1) {
-
+    private void say(String str) {
 
             HashMap<String, String> map = new HashMap<String, String>();
             map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
             tts.speak(str, TextToSpeech.QUEUE_FLUSH, map);
-            tts.speak(str1, TextToSpeech.QUEUE_ADD, map);
-            
+
             //Utteranceprogresslistener used to identify whenn TTS is completed...
             tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                 @Override
@@ -170,6 +172,41 @@ public class TTSService extends TextToSpeechService  implements TextToSpeech.OnI
 
             });
     }
+    private void say(String str,String str1) {
+
+        tts.setSpeechRate(0.75f);
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "UniqueID");
+        tts.speak(str, TextToSpeech.QUEUE_FLUSH, null);
+        tts.speak(str1, TextToSpeech.QUEUE_ADD, map);
+
+        //Utteranceprogresslistener used to identify whenn TTS is completed...
+        tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+            @Override
+            public void onStart(String s) {
+                //speakig started
+                Log.i(TAG, "started speaking ");
+            }
+
+            @Override
+            public void onDone(String s) {
+                //speaking stopped
+                Log.v(TAG, "about to listen "+ s);
+                if (serviceCallbacks != null) {
+                    serviceCallbacks.doSomething();
+                }
+
+            }
+
+            @Override
+            public void onError(String s) {
+                // there was an error
+                Log.e("error","error:"+s);
+            }
+
+        });
+    }
+
 
 }
 

@@ -45,7 +45,7 @@ public class UserMode extends AppCompatActivity implements ServiceCallbacks {
         super.onStart();
         speechIntent = new Intent(UserMode.this, TTSService.class);
         speechIntent.putExtra("content_to_speak", "welcome to User Commands section! Which command you want to run?");
-        speechIntent.putExtra("options", "1. Acceleration 2. Left 3. Right 4. Reverse");
+        speechIntent.putExtra("options", " one for Acceleration   2 for Left   3 for Right  4 for Reverse");
         bindService(speechIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         startService(speechIntent);
     }
@@ -138,8 +138,7 @@ public class UserMode extends AppCompatActivity implements ServiceCallbacks {
                     Toast.makeText(UserMode.this,
                             "result: " + Result,
                             Toast.LENGTH_SHORT).show();
-
-
+                    finish();
                 }
             }
         }

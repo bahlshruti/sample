@@ -90,8 +90,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
 
         bindService(speechIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         startService(speechIntent);
-
-
     }
 
     @Override
@@ -180,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
             TTS=null;
             speechIntent=null;
 
-
     }
 
     /**
@@ -209,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements ServiceCallbacks 
                             } else if (Result.get(0).equals("yes") && response.equals("yes")) {
                                 Intent intent = new Intent(MainActivity.this, ModeActivity.class);
                                 startActivity(intent);
+                                finish();
 
                             } else if ((Result.get(0).equals("no") && response.equals("no")) || (Result.get(0).equals("no") && response.equals("yes"))) {
 

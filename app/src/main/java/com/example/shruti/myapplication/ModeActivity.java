@@ -66,8 +66,6 @@ public class ModeActivity extends AppCompatActivity implements ServiceCallbacks 
         if(TTS !=null || speechIntent !=null)
             TTS=null;
         speechIntent=null;
-
-
     }
 
     /**
@@ -135,7 +133,7 @@ public class ModeActivity extends AppCompatActivity implements ServiceCallbacks 
                             "result: " + Result,
                             Toast.LENGTH_SHORT).show();
 
-                    if (Result.get(0).equals("1") || Result.get(0).equals("2") || Result.get(0).equals("3")) {
+                    if (Result.get(0).equals("1") || Result.get(0).equals("2") || Result.get(0).equals("3") || Result.get(0).equals("exit")) {
 
                         if (!flag) {
                             response = Result.get(0);
@@ -144,13 +142,23 @@ public class ModeActivity extends AppCompatActivity implements ServiceCallbacks 
                     } else if (Result.get(0).equals("yes") && response.equals("1")) {
                         intent = new Intent(ModeActivity.this, UserMode.class);
                         startActivity(intent);
+                        finish();
+
                     } else if (Result.get(0).equals("yes") && response.equals("2")) {
                         intent = new Intent(ModeActivity.this, AutoPilotMode.class);
                         startActivity(intent);
                     } else if (Result.get(0).equals("yes") && response.equals("3")) {
                         intent = new Intent(ModeActivity.this, AutoMode.class);
                         startActivity(intent);
-                    } else {
+                    }
+                    else if(Result.get(0).equals("yes") && response.equals("exit"))
+                    {
+                            // to exit from application
+                        flag=false;
+                        finish();
+
+                    }
+                    else {
                         flag = false;
                         speechIntent.putExtra("content_to_speak", " please try again?");
                         startService(speechIntent);
